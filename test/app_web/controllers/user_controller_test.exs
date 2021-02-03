@@ -45,6 +45,7 @@ defmodule MainModuleWeb.UserControllerTest do
                "id" => id,
                "email" => "some email",
                "name" => "some name",
+               "password" => "some password",
                "surname" => "some surname"
              } = json_response(conn, 200)["data"]
     end
@@ -68,6 +69,7 @@ defmodule MainModuleWeb.UserControllerTest do
                "id" => id,
                "email" => "some updated email",
                "name" => "some updated name",
+               "password" => "some updated password",
                "surname" => "some updated surname"
              } = json_response(conn, 200)["data"]
     end

@@ -27,12 +27,13 @@ defmodule MainModuleWeb.Router do
 
   scope "/api", MainModuleWeb do
     pipe_through :api
-    post "/users/sign_in", UserController, :sign_in
+    post "/users/login", UserController, :sign_in
+    post "/users/register", UserController, :create
   end
 
   scope "/api", MainModuleWeb do
     pipe_through [:api, :api_auth]
-    resources "/users", UserController, except: [:new, :edit]
+    resources "/users", UserController, except: [:new, :edit, :create]
   end
 
   if Mix.env() in [:dev, :test] do
