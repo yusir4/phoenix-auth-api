@@ -36,3 +36,13 @@ Register API | Login API | JWT API | Follow API | RabbitMQ
 :------------ | :-------------| :-------------| :------------- | :-------------
 :heavy_check_mark: | :heavy_check_mark: |  :clock3: | :clock3: | :clock3:
 
+## Rotalar
+
+      user_path  POST    /api/users/login        MainModuleWeb.UserController :sign_in
+      user_path  POST    /api/users/register     MainModuleWeb.UserController :create
+      user_path  GET     /api/users              MainModuleWeb.UserController :index
+      user_path  GET     /api/users/:id          MainModuleWeb.UserController :show
+      user_path  PATCH   /api/users/:id          MainModuleWeb.UserController :update
+      PUT     /api/users/:id          MainModuleWeb.UserController :update
+      user_path  DELETE  /api/users/:id          MainModuleWeb.UserController :delete
+
