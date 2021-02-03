@@ -45,10 +45,15 @@ defmodule MainModuleWeb.UserController do
     case MainModule.Account.authenticate_user(email, password) do
       {:ok, user} ->
         conn
+        |> put_session(:current_user_id, user.id)
+        |> configure_session(renew: true)
+        |> put_status(:ok)
         |> put_view(MainModuleWeb.UserView)
         |> render("sign_in.json", user: user)
       {:error, message} ->
         conn
+        |> delete_session(:current_user_id)
+        |> put_status(:unauthorized)
         |> put_view(MainModuleWeb.ErrorView)
         |> render("401.json", message: message)
     end
