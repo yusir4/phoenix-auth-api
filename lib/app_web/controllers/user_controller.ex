@@ -40,4 +40,18 @@ defmodule MainModuleWeb.UserController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def sign_in(conn, %{"email" => email, "password" => password}) do
+    case MainModule.Account.authenticate_user(email, password) do
+      {:ok, user} ->
+        conn
+        |> put_view(MainModuleWeb.UserView)
+        |> render("sign_in.json", user: user)
+      {:error, message} ->
+        conn
+        |> put_view(MainModuleWeb.ErrorView)
+        |> render("401.json", message: message)
+    end
+  end
+
 end

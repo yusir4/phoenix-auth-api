@@ -8,6 +8,7 @@ defmodule MainModuleWeb.Router do
   scope "/api", MainModuleWeb do
     pipe_through :api
     resources "/users", UserController, except: [:new, :edit]
+    post "/users/sign_in", UserController, :sign_in
   end
 
   if Mix.env() in [:dev, :test] do
