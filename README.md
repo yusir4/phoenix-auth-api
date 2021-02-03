@@ -1,20 +1,38 @@
-# MainModule
+# Authentication & Follow API
 
-To start your Phoenix server:
+## Görev
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Start Phoenix endpoint with `mix phx.server`
+1. Login - Register İşlemleri
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+-  Ad-Soyad, Email ve Şifre ile kayıt yapılabilen bir register api
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+> Burada kontrol edilmesi gereken tek şey aynı email'e sahip başka bir kullanıcının olup-olmayışı ve email-validation
 
-## Learn more
+- Email ve Şifre ile  giriş yapılabilen bir login api
+      
+     Login api'si iki aşamadan oluşacaktır
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
-# phoenix-auth-api
+     > Kullanıcı Email ve Şifresini bir servise gönderir. Servis başarılı bir sonuç verirse bir refresh token ile response döner. Response ile gelen refresh token kullanım süresi 6 aydır.
+
+     > Kullanıcı bu refresh token ile jwt-token talep eder. Bu jwt-token'in kullanım süresi sadece 15 dk'dır, kullanım süresi dolduğunda başka bir işlem yapılacaksa refresh token ile yeniden jwt-token talep edilir
+
+2. Takipleşme Kurgusu için gerekli api
+
+- Kayıtlı olan bir kullanıcı, kayıtlı olan bir başka kullanıcıya takip isteği gönderir.
+
+> Takip edilen kullanıcıya RabbitMQ kullanılarak işlem kuyrugu convansiyonuna göre takip bilgisi için mail gönderimi sağlanır.
+
+
+## Yapılandırma
+
+* Elixir version = 1.11.2
+* Phoenix version = 1.5.7
+* Authentication: JWT
+* Database = Postgresql
+
+## Durum
+
+Register API | Login API | JWT API | Follow API | RabbitMQ 
+:------------ | :-------------| :-------------| :------------- | :-------------
+:heavy_check_mark: | :heavy_check_mark: |  :clock3: | :clock3: | :clock3:
+
