@@ -27,13 +27,11 @@ defmodule MainModuleWeb.UserView do
       }
     }
   end
-  def render("refresh_token.json", %{user: user}) do
+
+  def render("access_token.json", %{token: token}) do
     %{
       data: %{
-        user: %{
-          id: user.id,
-          email: user.email
-        }
+        access_token: token
       }
     }
   end

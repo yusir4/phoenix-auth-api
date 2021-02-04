@@ -72,7 +72,7 @@ defmodule MainModuleWeb.UserController do
       token = MainModule.Token.generate_and_sign!(extra_claims)
       conn
         |> put_status(:created)
-        |> json(%{data: %{access_token: token}})
+        |> render("access_token.json", token: token)
     end
   end
 end
