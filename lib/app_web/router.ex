@@ -11,13 +11,13 @@ defmodule MainModuleWeb.Router do
   end
 
   # Plug function
-  defp ensure_authenticated(conn, _opts) do
-    current_user_id = get_session(conn, :current_user_id)
-
-    if current_user_id do
+  defp ensure_authenticated(conn, _) do
+    request_access_token = get_req_header(conn, "authorization")
+    access_token = to_string(request_access_token)
+    condition = String.length access_token
+    # Şimdilik Access Token Var mı Yok mu ona göre bir kontrol yapıldı. Güncellenecek...
+    if condition != 0 do
       conn
-      |> json(%{data: %{current_user_id: current_user_id}})
-
     else
       conn
       |> put_status(:unauthorized)
