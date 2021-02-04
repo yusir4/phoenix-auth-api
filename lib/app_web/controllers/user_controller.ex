@@ -41,22 +41,38 @@ defmodule MainModuleWeb.UserController do
     end
   end
 
-  def sign_in(conn, %{"email" => email, "password" => password}) do
-    case MainModule.Account.authenticate_user(email, password) do
-      {:ok, user} ->
-        conn
-        |> put_session(:current_user_id, user.id)
-        |> configure_session(renew: true)
-        |> put_status(:ok)
-        |> put_view(MainModuleWeb.UserView)
-        |> render("sign_in.json", user: user)
-      {:error, message} ->
-        conn
-        |> delete_session(:current_user_id)
-        |> put_status(:unauthorized)
-        |> put_view(MainModuleWeb.ErrorView)
-        |> render("401.json", message: message)
+  def sign_in(conn, params) do
+    if params["refresh_token"] == nil and params["email"] != nil and params["password"] != nil do
+    # Email ve Şifre parametresi geldi
+      email = params["email"]
+      password = params["password"]
+      case MainModule.Account.authenticate_user(email, password) do
+        {:ok, user} ->
+          # Kullanıcı adı ve şifresi doğru.
+          # TODO: Refresh Token Oluşturulacak
+          conn
+            |> put_session(:current_user_id, user.id)
+            |> configure_session(renew: true)
+            |> put_status(:ok)
+            |> put_view(MainModuleWeb.UserView)
+            |> render("sign_in.json", user: user)
+        {:error, message} ->
+          # Kullanıcı adı ve şifresi yanlış.
+          conn
+            |> delete_session(:current_user_id)
+            |> put_status(:unauthorized)
+            |> put_view(MainModuleWeb.ErrorView)
+            |> render("401.json", message: message)
+      end
+    end
+    if params["refresh_token"] != nil and params["email"] == nil and params["password"] == nil do
+    # Refresh Token parametresi geldi
+    # Access Token oluştur
+      # extra_claims = %{"user_id" => :id} |>
+      # token = MainModule.Token.generate_and_sign!(extra_claims) |>
+      conn
+        |> put_status(:created)
+        |> json(%{data: %{access_token: "token"}})
     end
   end
-
 end
