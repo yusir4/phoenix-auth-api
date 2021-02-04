@@ -67,12 +67,20 @@ defmodule MainModuleWeb.UserController do
     end
     if params["refresh_token"] != nil and params["email"] == nil and params["password"] == nil do
     # Refresh Token parametresi geldi
-    # Access Token oluştur
-      extra_claims = %{"type" => :access_token}
-      token = MainModule.Token.generate_and_sign!(extra_claims)
-      conn
-        |> put_status(:created)
-        |> render("access_token.json", token: token)
+    # Eski Access Token varsa onu kullan yoksa Yeni oluştur.
+      old_access_token = get_session(conn, :access_token)
+      if old_access_token do
+        conn
+          |> put_status(:ok)
+          |> render("access_token.json", token: old_access_token)
+      else
+        extra_claims = %{"type" => :access_token}
+        token = MainModule.Token.generate_and_sign!(extra_claims)
+        conn
+          |> put_session(:access_token, token)
+          |> put_status(:ok)
+          |> render("access_token.json", token: token)
+      end
     end
   end
 end

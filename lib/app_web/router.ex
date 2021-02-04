@@ -16,6 +16,8 @@ defmodule MainModuleWeb.Router do
 
     if current_user_id do
       conn
+      |> json(%{data: %{current_user_id: current_user_id}})
+
     else
       conn
       |> put_status(:unauthorized)
