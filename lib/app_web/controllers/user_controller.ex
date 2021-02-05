@@ -49,13 +49,28 @@ defmodule MainModuleWeb.UserController do
       case MainModule.Account.authenticate_user(email, password) do
         {:ok, user} ->
           # Kullanıcı adı ve şifresi doğru.
-          # TODO: Refresh Token Oluşturulacak
-          conn
-            |> put_session(:current_user_id, user.id)
-            |> configure_session(renew: true)
+          # Eski Refresh Token varsa onu kullan yoksa Yeni oluştur.
+
+          user_id    = user.id
+          secret     = "secret"
+          namespace  = "user auth"
+          max_age    =  180 * 24 * 60 * 60 # 6 Ay
+
+          old_refresh_token = get_session(conn, :refresh_token)
+
+          if old_refresh_token do
+            conn
             |> put_status(:ok)
             |> put_view(MainModuleWeb.UserView)
-            |> render("sign_in.json", user: user)
+            |> render("refresh_token.json", token: old_refresh_token)
+          else
+            token = Phoenix.Token.sign(secret, namespace, user_id, max_age: max_age) 
+            conn
+              |> put_session(:refresh_token, token)
+              |> put_status(:ok)
+              |> put_view(MainModuleWeb.UserView)
+              |> render("refresh_token.json", token: token)
+            end
         {:error, message} ->
           # Kullanıcı adı ve şifresi yanlış.
           conn
