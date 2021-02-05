@@ -61,7 +61,7 @@ defmodule MainModuleWeb.UserController do
           else
             new_refresh_token(conn, namespace, user_id, max_age)
           end
-          
+
         {:error, message} ->
           # Kullanıcı adı ve şifresi yanlış.
           conn
@@ -90,7 +90,7 @@ defmodule MainModuleWeb.UserController do
     end
   end
 
-  def refresh_token_verify(conn, namespace, token ) do
+  defp refresh_token_verify(conn, namespace, token ) do
     # 6 Aylık Refresh Token Süresini kontrol eder.
     case Phoenix.Token.verify(conn, namespace, token ) do
       {:ok, _} ->
@@ -107,7 +107,7 @@ defmodule MainModuleWeb.UserController do
     end
   end
 
-  def new_refresh_token(conn, namespace, user_id, max_age ) do
+  defp new_refresh_token(conn, namespace, user_id, max_age ) do
     token = Phoenix.Token.sign(conn, namespace, user_id, max_age: max_age) 
     conn
       |> put_session(:refresh_token, token)
