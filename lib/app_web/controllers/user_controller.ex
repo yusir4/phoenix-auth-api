@@ -3,7 +3,6 @@ defmodule MainModuleWeb.UserController do
 
   alias MainModule.Account
   alias MainModule.Account.User
-
   action_fallback MainModuleWeb.FallbackController
 
   def index(conn, _params) do
@@ -52,25 +51,17 @@ defmodule MainModuleWeb.UserController do
           # Eski Refresh Token varsa onu kullan yoksa Yeni oluştur.
 
           user_id    = user.id
-          secret     = "secret"
           namespace  = "user auth"
           max_age    =  180 * 24 * 60 * 60 # 6 Ay
 
           old_refresh_token = get_session(conn, :refresh_token)
 
           if old_refresh_token do
-            conn
-            |> put_status(:ok)
-            |> put_view(MainModuleWeb.UserView)
-            |> render("refresh_token.json", token: old_refresh_token)
+            refresh_token_verify(conn, namespace, old_refresh_token)
           else
-            token = Phoenix.Token.sign(secret, namespace, user_id, max_age: max_age) 
-            conn
-              |> put_session(:refresh_token, token)
-              |> put_status(:ok)
-              |> put_view(MainModuleWeb.UserView)
-              |> render("refresh_token.json", token: token)
-            end
+            new_refresh_token(conn, namespace, user_id, max_age)
+          end
+          
         {:error, message} ->
           # Kullanıcı adı ve şifresi yanlış.
           conn
@@ -98,4 +89,31 @@ defmodule MainModuleWeb.UserController do
       end
     end
   end
+
+  def refresh_token_verify(conn, namespace, token ) do
+    # 6 Aylık Refresh Token Süresini kontrol eder.
+    case Phoenix.Token.verify(conn, namespace, token ) do
+      {:ok, _} ->
+        conn
+          |> put_status(:ok)
+          |> put_view(MainModuleWeb.UserView)
+          |> render("refresh_token.json", token: token)
+      {:error, _} ->
+        conn
+          |> delete_session(:refresh_token)
+          |> put_status(:unauthorized)
+          |> put_view(MainModuleWeb.ErrorView)
+          |> render("401.json", message: "Unauthenticated user")
+    end
+  end
+
+  def new_refresh_token(conn, namespace, user_id, max_age ) do
+    token = Phoenix.Token.sign(conn, namespace, user_id, max_age: max_age) 
+    conn
+      |> put_session(:refresh_token, token)
+      |> put_status(:ok)
+      |> put_view(MainModuleWeb.UserView)
+      |> render("refresh_token.json", token: token)
+  end
+
 end

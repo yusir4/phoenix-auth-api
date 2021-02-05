@@ -20,10 +20,10 @@ defmodule MainModuleWeb.Router do
       conn
     else
       conn
-      |> put_status(:unauthorized)
-      |> put_view(MainModuleWeb.ErrorView)
-      |> render("401.json", message: "Unauthenticated user")
-      |> halt()
+        |> put_status(:unauthorized)
+        |> put_view(MainModuleWeb.ErrorView)
+        |> render("401.json", message: "Unauthenticated user")
+        |> halt()
     end
   end
 

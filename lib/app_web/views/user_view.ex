@@ -17,6 +17,12 @@ defmodule MainModuleWeb.UserView do
       surname: user.surname}
   end
 
+  def render("debug.json", %{arg: arg}) do
+    %{
+      data: arg
+    }
+  end
+
   def render("access_token.json", %{token: token}) do
     %{
       data: %{
