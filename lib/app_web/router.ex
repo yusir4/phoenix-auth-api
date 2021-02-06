@@ -10,14 +10,24 @@ defmodule MainModuleWeb.Router do
     plug :ensure_authenticated
   end
 
-  # Plug function
   defp ensure_authenticated(conn, _) do
     request_access_token = get_req_header(conn, "authorization")
     access_token = to_string(request_access_token)
     condition = String.length access_token
-    # Şimdilik Access Token Var mı Yok mu ona göre bir kontrol yapıldı. Güncellenecek...
+
+    # Header Kısmında Access Token yoksa Unauthenticated döndür.
     if condition != 0 do
-      conn
+      case MainModule.Token.verify_and_validate(access_token) do
+        {:ok, _} ->
+          conn
+        {:error, _} ->
+        # Access Token süresi dolmuşsa Unauthenticated döndür.
+          conn
+            |> put_status(:unauthorized)
+            |> put_view(MainModuleWeb.ErrorView)
+            |> render("401.json", message: "Unauthenticated user")
+            |> halt()
+      end
     else
       conn
         |> put_status(:unauthorized)

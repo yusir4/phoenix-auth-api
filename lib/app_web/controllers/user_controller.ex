@@ -74,19 +74,17 @@ defmodule MainModuleWeb.UserController do
     if params["refresh_token"] != nil and params["email"] == nil and params["password"] == nil do
     # Refresh Token parametresi geldi
     # Eski Access Token varsa onu kullan yoksa Yeni oluştur.
+
+      namespace  = "user auth"
+      refresh_token = params["refresh_token"]
+
       old_access_token = get_session(conn, :access_token)
       if old_access_token do
-        conn
-          |> put_status(:ok)
-          |> render("access_token.json", token: old_access_token)
+        access_token_verify(conn, old_access_token)
       else
-        extra_claims = %{"type" => :access_token}
-        token = MainModule.Token.generate_and_sign!(extra_claims)
-        conn
-          |> put_session(:access_token, token)
-          |> put_status(:ok)
-          |> render("access_token.json", token: token)
+        new_access_token(conn, namespace, refresh_token)
       end
+
     end
   end
 
@@ -114,6 +112,40 @@ defmodule MainModuleWeb.UserController do
       |> put_status(:ok)
       |> put_view(MainModuleWeb.UserView)
       |> render("refresh_token.json", token: token)
+  end
+
+  defp new_access_token(conn, namespace, token ) do
+    case Phoenix.Token.verify(conn, namespace, token ) do
+      {:ok, user_id} ->
+        token = MainModule.Token.generate_and_sign!(%{"user_id" => user_id})
+        conn
+          |> put_session(:access_token, token)
+          |> put_status(:ok)
+          |> put_view(MainModuleWeb.UserView)
+          |> render("access_token.json", token: token)
+      {:error, _} ->
+        conn
+          |> put_status(:unauthorized)
+          |> put_view(MainModuleWeb.ErrorView)
+          |> render("debug.json", message: "Unauthenticated user")
+    end
+  end
+
+  defp access_token_verify(conn, token) do
+    # 15 Dakikalık Access Token Süresini kontrol eder.
+    case MainModule.Token.verify_and_validate(token) do
+      {:ok, _claim_map} ->
+        conn
+          |> put_status(:ok)
+          |> put_view(MainModuleWeb.UserView)
+          |> render("access_token.json", token: token)
+      {:error, _} ->
+        conn
+          |> delete_session(:access_token)
+          |> put_status(:unauthorized)
+          |> put_view(MainModuleWeb.ErrorView)
+          |> render("401.json", message: "Unauthenticated user")
+    end
   end
 
 end
