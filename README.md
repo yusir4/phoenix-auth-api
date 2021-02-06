@@ -34,7 +34,7 @@
 
 Register API | Login API | JWT API | Follow API | RabbitMQ 
 :------------ | :-------------| :-------------| :------------- | :-------------
-:heavy_check_mark: | :heavy_check_mark: |  :clock3: | :clock3: | :clock3:
+:heavy_check_mark: | :heavy_check_mark: |  :heavy_check_mark: | :clock3: | :clock3:
 
 ## Rotalar
 
@@ -43,6 +43,6 @@ Register API | Login API | JWT API | Follow API | RabbitMQ
       user_path  GET     /api/users              MainModuleWeb.UserController :index
       user_path  GET     /api/users/:id          MainModuleWeb.UserController :show
       user_path  PATCH   /api/users/:id          MainModuleWeb.UserController :update
-      PUT     /api/users/:id          MainModuleWeb.UserController :update
+                 PUT     /api/users/:id          MainModuleWeb.UserController :update
       user_path  DELETE  /api/users/:id          MainModuleWeb.UserController :delete
 
